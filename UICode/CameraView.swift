@@ -26,7 +26,16 @@ struct CameraView: View {
                         lastZoom = camera.setZoomFactor(lastZoom * scale)
                     }
             )
-        
+            .onAppear {
+                AppDelegate.orientationLock = .landscape
+                UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+                UIViewController.attemptRotationToDeviceOrientation()
+            }
+            .onDisappear {
+                AppDelegate.orientationLock = .portrait
+                UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+                UIViewController.attemptRotationToDeviceOrientation()
+            }
         
     }
 }
