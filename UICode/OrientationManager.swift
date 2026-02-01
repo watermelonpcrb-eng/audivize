@@ -6,44 +6,28 @@
 //
 
 import SwiftUI
-import UIKit
-import Combine
 
-
-class OrientationManager: ObservableObject {
-    @Published var orientationLock: UIInterfaceOrientationMask = .portrait
+class landscapeUIViewController<Content: View>: UIHostingController<Content> {
     
-    func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
-        self.orientationLock = orientation
-        
-        if let rotateOrientation = rotateOrientation {
-            UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
-        }
-        
-        UINavigationController.attemptRotationToDeviceOrientation()
-    }
-}
-
-class LandscapeController<Content: View>: UIHostingController<Content> {
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .landscape
+        .landscape
     }
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return .landscapeLeft
-    }
-}
-struct LandscapeViewModifier: ViewModifier {
-    @ObservedObject var orientationManager: OrientationManager
     
-    func body(content: Content) -> some View {
-        content
-            .onAppear {
-                // Lock to landscape and force rotation
-                orientationManager.lockOrientation(.landscape, andRotateTo: .landscapeRight)
-            }
-            .onDisappear {
-                // Return to portrait and force rotation
-                orientationManager.lockOrientation(.portrait, andRotateTo: .portrait)
-            }
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        .landscapeRight
     }
+    override var shouldAutorotate: Bool {
+        true
+    }
+    
+}
+
+struct LandscapeView<Content: View>: UIViewControllerRepresentable {
+    let content: Content
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        landscapeUIViewController(rootView: content)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
